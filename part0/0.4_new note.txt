@@ -1,0 +1,23 @@
+title 0.4: new note
+
+note over browser:
+write some text to the input element then press save button
+end note
+
+browser->server: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note
+note over server:
+save the data from post request and response the path where browser will redirect 
+end note
+server-->browser: HTTP Status Code: 302
+browser->server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/notes
+server-->browser: HTML-code
+note over browser:
+render html page, request main.js
+end note
+browser->server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/main.js
+server-->browser: main.js
+note over browser:
+execute code in main.js, make a GET request to get data.json
+end note
+browser->server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/data.json
+server-->browser: data.json (newest)

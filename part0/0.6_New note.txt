@@ -1,0 +1,10 @@
+title 0.6: New note
+
+note over browser:
+write some text to the input element then press save button
+end note
+note over browser:
+make a json: {content: user input, date: the time when press the button} as request payload
+end note
+browser->server: HTTP POST https://studies.cs.helsinki.fi/exampleapp/new_note_spa
+server-->browser: {"message":"note created"}
