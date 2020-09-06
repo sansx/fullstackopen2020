@@ -12,8 +12,10 @@ server-->browser: HTTP Status Code: 302
 browser->server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/notes
 server-->browser: HTML-code
 note over browser:
-render html page, request main.js
+render html page, request main.css and main.js
 end note
+browser->server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/main.css
+server-->browser: main.css
 browser->server: HTTP GET https://studies.cs.helsinki.fi/exampleapp/main.js
 server-->browser: main.js
 note over browser:
