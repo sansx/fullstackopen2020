@@ -1,7 +1,7 @@
 import React from 'react'
 
 const Part = ({ data }) => <p>
-    {data.title} {data.exercises}
+    {data.name} {data.exercises}
 </p>
 
 export default Part
