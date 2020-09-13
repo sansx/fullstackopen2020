@@ -10,12 +10,11 @@ function App() {
 
   useEffect(() => {
     axios.get('https://restcountries.eu/rest/v2/all').then(res => {
-      console.log(res);
       setCountries(res.data)
     })
   }, [])
 
-  const handleValChange = e => { setFilterVal(e.target.value.toLowerCase()); setShowArr([]) }
+  const handleValChange = e => { setFilterVal(e.target.value.toLowerCase().trim()); setShowArr([]) }
 
 
   return (
