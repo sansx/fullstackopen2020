@@ -52,8 +52,10 @@ const App = () => {
       setPersons(copy)
       messageCountdown(`Updated ${res.name}'s number`)
     }).catch(err => {
-      setPersons(persons.filter(person => person.id !== id))
-      messageCountdown(`Information of ${newName}  has already been removed from the server`, true)
+      services.getAll().then(res => setPersons(res))
+      // setPersons(persons.filter(person => person.id !== id))
+      // messageCountdown(`Information of ${newName}  has already been removed from the server`, true)
+      messageCountdown(err.response.data.error, true)
     })
   }
 
@@ -62,6 +64,8 @@ const App = () => {
     services.create({ name: newName, number: newNumber }).then(res => {
       setPersons([...persons, res])
       messageCountdown(`Added ${res.name}`)
+    }).catch(err => {
+      messageCountdown(err.response.data.error, true)
     })
   }
 
