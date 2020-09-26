@@ -52,19 +52,20 @@ describe('blog post test', () => {
   })
 
   test('post blog if not have like attribute, that will be 0', async () => {
-    const blog_will_up = {
-      title: 'test2',
-      author: 'someone',
-      url: 'https://reactpatterns.com/'
-    }
-    await api.post('/api/blogs').send(blog_will_up)
+    await api.post('/api/blogs').send(blog_will_up).expect(201)
     const res = (await api.get('/api/blogs')).body.filter(e => e.title === blog_will_up.title)[0]
     expect(res).toHaveProperty('likes', 0)
   })
 
+  test('if no titlel or url then return 400 error', async (done) => {
+    const post_blog_without_sth = {
+      author: 'someone'
+    }
+    await api.post('/api/blogs').send(post_blog_without_sth).expect(400)
+    done()
+  })
+
 })
-
-
 
 afterAll(() => {
   mongoose.connection.close()
