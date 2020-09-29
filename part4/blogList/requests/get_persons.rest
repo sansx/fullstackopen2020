@@ -1,10 +1,17 @@
-POST  http://localhost:3001/api/users
+GET   http://localhost:3001/api/users
 Content-Type: application/json
 
 {   
-    "username":"qwe",
-    "name":"zzz",
-    "password": "1111"
+    "title":"qqq",
+    "url":"fgdgfasdasf",
+    "password": "1111",
+    "author": "Wlasd Qiajsd"
 }
+
+# {   
+#     "username":"qwe",
+#     "name":"zzz",
+#     "password": "1111"
+# }
 
 

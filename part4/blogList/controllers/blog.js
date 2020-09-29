@@ -12,7 +12,11 @@ const getTokenFrom = request => {
 }
 
 blogRouter.get('/', async (request, response) => {
-  let blogs = await Blog.find({})
+  let blogs = await Blog.find({}).populate('user', {
+    username: 1,
+    name: 1,
+    id: 1
+  })
   response.json(blogs)
 })
 
@@ -30,9 +34,15 @@ blogRouter.post('/', async (request, response) => {
     })
   }
 
-  const blog = new Blog(request.body).save()
   const user = await User.findById(decodedToken.id)
-  user.notes = user.notes.concat(blog._id)
+  const blog = await new Blog({
+    ...request.body,
+    user: user._id
+  }).save()
+  console.log(blog);
+
+  console.log(user);
+  user.blogs = user.blogs.concat(blog._id)
   await user.save()
   response.status(201).json(blog)
 })
