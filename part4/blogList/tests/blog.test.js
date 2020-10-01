@@ -83,6 +83,13 @@ describe('blog post test', () => {
     expect(res.body.error).toContain('token missing or invalid')
   })
 
+  test('post blog with wrong token', async () => {
+    let res = await api.post('/api/blogs').send(blog_will_up).set({
+      Authorization: 'bearer zzzzz'
+    }).expect(401)
+
+    expect(res.body.error).toContain('invalid token')
+  })
 
   test('post test', async () => {
     let previous = await api.get('/api/blogs')
@@ -99,7 +106,7 @@ describe('blog post test', () => {
     expect(res).toHaveProperty('likes', 0)
   })
 
-  test('if no titlel or url then return 400 error', async (done) => {
+  test('if no title or url then return 400 error', async (done) => {
     const post_blog_without_sth = {
       author: 'someone'
     }
@@ -117,6 +124,16 @@ describe('deletion of a blog', () => {
     let res = await api.delete(`/api/blogs/${blogToUpdate.id}`).expect(401)
 
     expect(res.body.error).toContain('token missing or invalid')
+  })
+
+  test('delete blog with wrong token', async () => {
+    const blogToUpdate = (await helper.blogsInDb())[0]
+
+    let res = await api.delete(`/api/blogs/${blogToUpdate.id}`).set({
+      Authorization: 'bearer zzzzz'
+    }).expect(401)
+
+    expect(res.body.error).toContain('invalid token')
   })
 
   test('succeeds with status code 204 if id is valid', async () => {
@@ -150,6 +167,18 @@ describe('update a blog', () => {
     expect(res.body.error).toContain('token missing or invalid')
   })
 
+  test('update blog with wrong token', async () => {
+    const blogToUpdate = (await helper.blogsInDb())[0]
+
+    let res = await api.put(`/api/blogs/${blogToUpdate.id}`).send({
+      ...blogToUpdate,
+      likes: 1000
+    }).set({
+      Authorization: 'bearer zzzzz'
+    }).expect(401)
+
+    expect(res.body.error).toContain('invalid token')
+  })
 
   test('succeeds with status code 204 if id is valid', async () => {
     const blogToUpdate = (await helper.blogsInDb())[0]
@@ -162,7 +191,7 @@ describe('update a blog', () => {
     expect(res.body.likes).toBe(1000)
   })
 
-  test('fail with status code 400 if id is valid', async (done) => {
+  test('fail with status code 400 if id is\'t valid', async (done) => {
     await authApi('put', '/api/blogs/1', {
       title: 'test1',
       author: 'someone',

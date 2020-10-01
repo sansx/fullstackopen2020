@@ -74,7 +74,7 @@ describe('when there is initially one user in db', () => {
     expect(usersAtEnd).toHaveLength(usersAtStart.length)
   })
 
-  test('user login with wrong password and username', async () => {
+  test('user login with wrong password or username', async () => {
     const err1 = await api.post('/api/login')
       .send({
         username: 'root',
