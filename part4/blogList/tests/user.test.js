@@ -74,6 +74,44 @@ describe('when there is initially one user in db', () => {
     expect(usersAtEnd).toHaveLength(usersAtStart.length)
   })
 
+  test('user login with wrong password and username', async () => {
+    const err1 = await api.post('/api/login')
+      .send({
+        username: 'root',
+        password: '',
+      }).expect(401)
+
+    const err2 = await api.post('/api/login')
+      .send({
+        username: 'zzzz',
+        password: '',
+      }).expect(401)
+
+    expect(err1.body.error).toContain('invalid username or password')
+    expect(err2.body.error).toContain('invalid username or password')
+  })
+
+
+})
+
+describe('create user with wrong info', () => {
+  test('create user with username and password that shorter than 3 characters ', async () => {
+    const err1 = await api.post('/api/users')
+      .send({
+        username: 'xx',
+        name: 'test',
+      }).expect(400)
+
+    const err2 = await api.post('/api/users')
+      .send({
+        username: 'xxxxx',
+        name: 'test',
+        password: 'qw'
+      }).expect(400)
+
+    expect(err1.body.error).toContain('both username and password must be at least 3 characters long.')
+    expect(err2.body.error).toContain('both username and password must be at least 3 characters long.')
+  })
 })
 
 afterAll(() => {
