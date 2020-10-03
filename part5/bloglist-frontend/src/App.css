@@ -37,12 +37,22 @@
   }
 }
 
+.success,
 .error {
-  color: red;
   background: lightgrey;
   font-size: 20px;
-  border-style: solid;
   border-radius: 5px;
   padding: 10px;
   margin-bottom: 10px;
-  }  
+}
+
+.success {
+  color: green;
+  /* border-color: green; */
+  border: 3px solid green;
+}
+
+.error {
+  color: red;
+  border: 3px solid red;
+}
