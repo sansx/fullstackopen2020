@@ -1,6 +1,7 @@
 import React, { useState } from 'react'
+import PropTypes from 'prop-types'
 
-const Blog = ({ blog, incLike }) => {
+const Blog = ({ blog, incLike, showDelete, onDelete }) => {
   const expectInfo = ['url', 'likes', 'author']
   const [detail, setDetail] = useState(false)
   const blogStyle = {
@@ -11,14 +12,23 @@ const Blog = ({ blog, incLike }) => {
     marginBottom: 5
   }
 
-  delete blog.user
-
   return (
     <div style={blogStyle}>
       {blog.title}  <button onClick={() => setDetail(!detail)} >{detail ? 'hide' : 'view'}</button>
-      {detail && expectInfo.map(e => <div key={Math.random()} >  {e === 'likes' ? <> likes {blog[e]} <button onClick={() => incLike(blog)} >like</button></> : blog[e]} </div>)}
+      {detail && <div>
+        {expectInfo.map(e => <div key={Math.random()} >  {e === 'likes' ? <> likes {blog[e]} <button onClick={() => incLike({ ...blog, user: blog.user.id })} >like</button></> : blog[e]} </div>)}
+        {showDelete && <button onClick={() => onDelete(blog)} >remove</button>}
+      </div>}
+
     </div>
   )
+}
+
+Blog.propTypes = {
+  blog: PropTypes.object.isRequired,
+  incLike: PropTypes.func.isRequired,
+  showDelete: PropTypes.bool.isRequired,
+  onDelete: PropTypes.func.isRequired,
 }
 
 export default Blog

@@ -3,10 +3,10 @@ import Blog from './components/Blog'
 import blogService from './services/blogs'
 import loginService from './services/login'
 import Notification from './components/Notification'
-import LoginForm from "./components/LoginForm"
-import CreatBlogForm from "./components/CreatBlogForm"
-import Togglable from "./components/Togglable"
-import "./App.css"
+import LoginForm from './components/LoginForm'
+import CreatBlogForm from './components/CreatBlogForm'
+import Togglable from './components/Togglable'
+import './App.css'
 
 
 const App = () => {
@@ -42,16 +42,16 @@ const App = () => {
   }
 
   const messageCountdown = (message, error = false, timeout = 3000) => {
-    error ? setErrorMessage(message) : setMessage(message);
+    error ? setErrorMessage(message) : setMessage(message)
     setTimeout(() => {
-      error ? setErrorMessage('') : setMessage('');
-    }, timeout);
+      error ? setErrorMessage('') : setMessage('')
+    }, timeout)
   }
 
   const handleCreate = async (blogInfo) => {
     try {
       const blog = await blogService.create(blogInfo)
-      console.log(blog);
+      console.log(blog)
       setBlogs([...blogs, blog])
       messageCountdown(`a new blog ${blog.title} by ${blog.author}`)
     } catch (err) {
@@ -62,9 +62,21 @@ const App = () => {
   const handleLikeUpdate = async (blog) => {
     try {
       const newBlog = await blogService.update(blog.id, { ...blog, likes: blog.likes + 1 })
-      console.log(newBlog);
+      console.log(newBlog)
       setBlogs(blogs.map(e => e.id === blog.id ? newBlog : e).sort((a, b) => b.likes - a.likes))
       messageCountdown(`You liked ${blog.title} by ${blog.author}`)
+    } catch (err) {
+      messageCountdown(err.response.data.error, true)
+    }
+  }
+
+  const handleDeleteBlog = async (blog) => {
+    try {
+      if (!window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) return
+      const res = await blogService.delBlog(blog.id)
+      console.log(res)
+      messageCountdown(`Blog ${blog.title} by ${blog.author} has removed`)
+      setBlogs(blogs.filter(e => e.id !== blog.id))
     } catch (err) {
       messageCountdown(err.response.data.error, true)
     }
@@ -88,7 +100,7 @@ const App = () => {
         </Togglable>
       </div>}
       {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} incLike={handleLikeUpdate} />
+        <Blog key={blog.id} blog={blog} incLike={handleLikeUpdate} showDelete={blog.user.username === user.username} onDelete={handleDeleteBlog} />
       )}
     </div>
   )

@@ -16,7 +16,7 @@ const LoginForm = ({ submitFn }) => {
     <form onSubmit={userLogin}>
       <div>
         username
-          <input
+        <input
           type="text"
           value={username}
           name="Username"
@@ -25,7 +25,7 @@ const LoginForm = ({ submitFn }) => {
       </div>
       <div>
         password
-          <input
+        <input
           type="password"
           value={password}
           name="Password"
