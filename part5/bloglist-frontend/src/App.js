@@ -51,7 +51,10 @@ const App = () => {
   const handleCreate = async (blogInfo) => {
     try {
       const blog = await blogService.create(blogInfo)
-      console.log(blog)
+      blog.user = {
+        id: blog.user,
+        username: user.username
+      }
       setBlogs([...blogs, blog])
       messageCountdown(`a new blog ${blog.title} by ${blog.author}`)
     } catch (err) {
