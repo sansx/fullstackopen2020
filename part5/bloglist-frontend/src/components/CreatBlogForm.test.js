@@ -17,12 +17,7 @@ function setIptVal(el, val) {
 test('create blog test', () => {
   const createBlog = jest.fn()
 
-  let component = render( <
-    CreatBlogForm addBlogFn = {
-      createBlog
-    }
-    />
-  )
+  let component = render(<CreatBlogForm addBlogFn={createBlog} />)
 
   const form = component.container.querySelector('form')
   // const author = component.container.querySelector('#author')
