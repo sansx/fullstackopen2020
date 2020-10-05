@@ -47,7 +47,7 @@ test('renders content click btn show detail', () => {
   expect(likesDiv).toHaveTextContent('likes 7')
 })
 
-test('likes button should double clike', () => {
+test('increase like handler should create twice', () => {
   const mockHandler = jest.fn()
   let component = render(
     <Blog blog={blog} incLike={mockHandler} onDelete={e => console.log(e)} showDelete={false} />
