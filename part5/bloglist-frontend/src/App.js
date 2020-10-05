@@ -63,10 +63,13 @@ const App = () => {
   }
 
   const handleLikeUpdate = async (blog) => {
+    if (!user) {
+      return messageCountdown('You should login if you want like this blog', true)
+    }
     try {
       const newBlog = await blogService.update(blog.id, { ...blog, likes: blog.likes + 1 })
-      console.log(newBlog)
-      setBlogs(blogs.map(e => e.id === blog.id ? newBlog : e).sort((a, b) => b.likes - a.likes))
+      delete newBlog.user
+      setBlogs(blogs.map(e => e.id === blog.id ? { ...e, ...newBlog } : e).sort((a, b) => b.likes - a.likes))
       messageCountdown(`You liked ${blog.title} by ${blog.author}`)
     } catch (err) {
       messageCountdown(err.response.data.error, true)
@@ -76,8 +79,7 @@ const App = () => {
   const handleDeleteBlog = async (blog) => {
     try {
       if (!window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) return
-      const res = await blogService.delBlog(blog.id)
-      console.log(res)
+      await blogService.delBlog(blog.id)
       messageCountdown(`Blog ${blog.title} by ${blog.author} has removed`)
       setBlogs(blogs.filter(e => e.id !== blog.id))
     } catch (err) {
@@ -96,15 +98,17 @@ const App = () => {
       {message && <Notification message={message} ></Notification>}
       {errorMessage && <Notification message={errorMessage} error={true} ></Notification>}
       {user === null ? <LoginForm submitFn={handleLogin} ></LoginForm> : <div>
-        <p>{user.name} logged-in <button onClick={handleLogout} >logout</button> </p>
+        <p>{user.name} logged in <button onClick={handleLogout} >logout</button> </p>
         <Togglable buttonLabel={'create new blog'} >
           <h2>create new</h2>
           <CreatBlogForm addBlogFn={handleCreate} ></CreatBlogForm>
         </Togglable>
       </div>}
-      {blogs.map(blog =>
-        <Blog key={blog.id} blog={blog} incLike={handleLikeUpdate} showDelete={blog.user.username === user.username} onDelete={handleDeleteBlog} />
-      )}
+      <div className="blogList">
+        {blogs.map(blog =>
+          <Blog key={blog.id} blog={blog} incLike={handleLikeUpdate} showDelete={!!user && blog.user.username === user.username} onDelete={handleDeleteBlog} />
+        )}
+      </div>
     </div>
   )
 }
