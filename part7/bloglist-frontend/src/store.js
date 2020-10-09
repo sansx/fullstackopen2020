@@ -16,7 +16,7 @@ const reducer = combineReducers({
   user: loginReducer,
   blogs: blogReducer,
   notice: notificationReducer,
-  userslist: usersReducer
+  userlist: usersReducer
   // filter: filterReducer
 })
 

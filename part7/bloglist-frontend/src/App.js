@@ -1,5 +1,6 @@
-import React, { useState, useEffect } from 'react'
+import React, { useEffect } from 'react'
 import Blog from './components/Blog'
+import BlogDetail from './components/BlogDetail'
 import blogService from './services/blogs'
 import { Link, Switch, Route, Redirect } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
@@ -8,9 +9,11 @@ import LoginForm from './components/LoginForm'
 import CreatBlogForm from './components/CreatBlogForm'
 import Togglable from './components/Togglable'
 import Users from './components/Users'
+import User from './components/User'
 import { setUser, logout } from './reducers/loginReducer'
 import { initblogs } from './reducers/blogReducer'
 import { initUsers } from './reducers/usersReducer'
+
 import './App.css'
 
 /**
@@ -47,7 +50,7 @@ const App = () => {
 
       <Switch>
         <Redirect exact path="/" to='/blogs' ></Redirect>
-        <Route path="/blogs" >
+        <Route exact path="/blogs" >
           <Togglable buttonLabel={'create new blog'} >
             <h2>create new</h2>
             <CreatBlogForm ></CreatBlogForm>
@@ -58,11 +61,13 @@ const App = () => {
             )}
           </div>
         </Route>
+        <Route exact path="/blogs/:id" >
+          <BlogDetail />
+        </Route>
 
-        <Route path='/users' > <Users></Users>  </Route>
+        <Route exact path='/users' > <Users />  </Route>
+        <Route exact path='/users/:id' > <User />  </Route>
       </Switch>
-
-
     </div>
   )
 }
