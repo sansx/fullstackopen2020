@@ -2,15 +2,16 @@ import React, { useEffect } from 'react'
 import Blog from './components/Blog'
 import BlogDetail from './components/BlogDetail'
 import blogService from './services/blogs'
-import { Link, Switch, Route, Redirect } from 'react-router-dom'
+import { Switch, Route, Redirect } from 'react-router-dom'
 import { useDispatch, useSelector } from 'react-redux'
 import Notification from './components/Notification'
-import LoginForm from './components/LoginForm'
 import CreatBlogForm from './components/CreatBlogForm'
 import Togglable from './components/Togglable'
 import Users from './components/Users'
 import User from './components/User'
-import { setUser, logout } from './reducers/loginReducer'
+import Header from './components/HeaderNav'
+import { Table, Jumbotron, Spinner } from 'react-bootstrap'
+import { setUser } from './reducers/loginReducer'
 import { initblogs } from './reducers/blogReducer'
 import { initUsers } from './reducers/usersReducer'
 
@@ -39,32 +40,41 @@ const App = () => {
   }, [dispatch])
 
   return (
-    <div>
-      <h2>blogs</h2>
-      <Notification></Notification>
-      <Notification error={true} ></Notification>
-      {user === null ? <LoginForm ></LoginForm> : <div>
-        <p>{user.name} logged in <button onClick={() => dispatch(logout())} >logout</button> </p>
-        <Link to='/users' > users </Link> <Link to='/blogs' > blogs </Link>
-      </div>}
+    <div className="container">
+      <Header></Header>
+
+      <Jumbotron>
+        <h2>blog app</h2>
+        <Notification></Notification>
+        <Notification error={true} ></Notification>
+      </Jumbotron>
 
       <Switch>
         <Redirect exact path="/" to='/blogs' ></Redirect>
         <Route exact path="/blogs" >
+          <div className="blogList">
+            <h2>Blogs</h2>
+            {!blogs && <Spinner animation="border" variant="primary" />}
+            <Table striped>
+              <thead>
+                <tr><td><strong>Title</strong></td><td><strong>Author</strong></td></tr>
+              </thead>
+              <tbody>
+
+                {blogs.sort((a, b) => b.likes - a.likes).map(blog =>
+                  <Blog key={blog.id} blog={blog} showDelete={!!user && blog.user.username === user.username} />
+                )}
+              </tbody>
+            </Table>
+          </div>
           <Togglable buttonLabel={'create new blog'} >
             <h2>create new</h2>
             <CreatBlogForm ></CreatBlogForm>
           </Togglable>
-          <div className="blogList">
-            {blogs.sort((a, b) => b.likes - a.likes).map(blog =>
-              <Blog key={blog.id} blog={blog} showDelete={!!user && blog.user.username === user.username} />
-            )}
-          </div>
         </Route>
         <Route exact path="/blogs/:id" >
           <BlogDetail />
         </Route>
-
         <Route exact path='/users' > <Users />  </Route>
         <Route exact path='/users/:id' > <User />  </Route>
       </Switch>

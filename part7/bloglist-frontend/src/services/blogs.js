@@ -39,6 +39,17 @@ const update = async (id, newObject) => {
   return res.data
 }
 
+const addComment = async (id, newObject) => {
+  const config = {
+    headers: {
+      Authorization: token
+    },
+  }
+
+  const res = await axios.post(`${ baseUrl }/${id}/comments`, newObject, config)
+  return res.data
+}
+
 const delBlog = async (id) => {
   const config = {
     headers: {
@@ -54,5 +65,6 @@ export default {
   create,
   update,
   delBlog,
-  setToken
+  setToken,
+  addComment
 }

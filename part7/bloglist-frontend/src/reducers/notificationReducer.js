@@ -4,8 +4,8 @@ const initialState = {
 };
 
 const reducer = (state = initialState, action) => {
-  console.log('state now: ', state)
-  console.log('action', action)
+  // console.log('state now: ', state)
+  // console.log('action', action)
 
   switch (action.type) {
     case "CREATE_NOTICE":

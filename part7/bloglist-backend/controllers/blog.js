@@ -83,4 +83,31 @@ blogRouter.put('/:id', async (request, response) => {
   }
 })
 
+blogRouter.post('/:id/comments', async (request, response) => {
+  const {
+    comment
+  } = request.body
+  if (!comment || comment === '') return response.status(400).json({
+    error: 'comment can not be null'
+  })
+
+  const decodedToken = request.token ? jwt.verify(request.token, process.env.SECRET) : null
+  const user = await User.findById(decodedToken.id)
+  if (!request.token || !decodedToken || !decodedToken.id || !user) {
+    return response.status(401).json({
+      error: 'token missing or invalid'
+    })
+  }
+
+  const blog = await Blog.findById(request.params.id).populate('user', {
+    username: 1,
+    name: 1,
+    id: 1
+  })
+
+  blog.comments.push(comment)
+  blog.save()
+  response.status(201).json(blog)
+})
+
 module.exports = blogRouter

@@ -12,14 +12,12 @@ const reducer = (state = [], action) => {
 }
 
 export const initUsers = () => async dispatch => {
-
   let users = await usersService.getAll()
 
   dispatch({
     type: 'INIT_USERS',
     data: users
   })
-
 }
 
 export default reducer

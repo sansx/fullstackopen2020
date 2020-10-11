@@ -4,16 +4,14 @@ import {
 } from './notificationReducer'
 
 const reducer = (state = [], action) => {
-  console.log('state now: ', state)
-  console.log('action', action)
+  // console.log('state now: ', state)
+  // console.log('action', action)
 
   switch (action.type) {
-    case "LIKE_BLOG":
+    case "UPDATE_BLOG":
       const {
         blog
       } = action.data
-
-      console.log(blog);
       return state.map(e => e.id === blog.id ? blog : e);
     case "NEW_BLOG":
       return [
@@ -50,7 +48,6 @@ export const like = id => async (dispatch, getState) => {
   const state = getState().blogs;
   const res = state.find(e => e.id === id)
   res.user = res.user.id
-
   try {
     let blog = await blogsService.update(id, {
       ...res,
@@ -58,7 +55,7 @@ export const like = id => async (dispatch, getState) => {
     })
 
     dispatch({
-      type: 'LIKE_BLOG',
+      type: 'UPDATE_BLOG',
       data: {
         blog
       }
@@ -69,10 +66,32 @@ export const like = id => async (dispatch, getState) => {
   }
 }
 
-export const remove = blog => async dispatch => {
+export const comment = (id, comment) => async (dispatch, getState) => {
+  // const state = getState().blogs;
+  // const res = state.find(e => e.id === id)
+  // res.user = res.user.id
+  try {
+    let blog = await blogsService.addComment(id, {
+      comment
+    })
+
+    dispatch({
+      type: 'UPDATE_BLOG',
+      data: {
+        blog
+      }
+    })
+    dispatch(setNotification(`You commented ${blog.title} by ${blog.author}`))
+  } catch (err) {
+    dispatch(setNotification(err.response.data.error, true))
+  }
+}
+
+export const remove = (blog, cb = () => {}) => async dispatch => {
   try {
     if (!window.confirm(`Remove blog ${blog.title} by ${blog.author}`)) return
     await blogsService.delBlog(blog.id)
+    cb()
     dispatch({
       type: 'DELETE_BLOG',
       data: blog.id
