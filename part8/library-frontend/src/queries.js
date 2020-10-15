@@ -27,3 +27,10 @@ export const ALL_BOOKS = gql `
     }
   }
 `
+
+export const ALL_TYPES = gql`
+  query {
+  allTypes
+}
+`
+

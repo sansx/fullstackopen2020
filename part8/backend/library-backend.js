@@ -1,7 +1,8 @@
 const {
   ApolloServer,
   gql,
-  UserInputError
+  UserInputError,
+  AuthenticationError
 } = require('apollo-server')
 const {
   v1: uuid
@@ -10,6 +11,7 @@ const mongoose = require('mongoose')
 const config = require('./config')
 const Author = require('./models/Author')
 const Book = require('./models/Book')
+const User = require('./models/User')
 const jwt = require('jsonwebtoken')
 
 const JWT_SECRET = process.env.SECRET
@@ -144,6 +146,7 @@ const typeDefs = gql `
     allBooks(author: String, genre: String): [Book!]!
     allAuthors: [Author!]!
     me: User
+    allTypes: [String!]!
   }
 
   type Mutation {
@@ -177,18 +180,24 @@ const resolvers = {
       // if (args.author) resBooks = resBooks.filter(book => book.author === args.author);
       // if (args.genre) resBooks = resBooks.filter(book => book.genres.find(e => e === args.genre))
       try {
-        let books = await Book.find({}).populate('author', {
+        let resBooks = await Book.find({}).populate('author', {
           name: 1,
           born: 1,
           id: 1,
           bookCount: 1
         })
-        return books
+        if (args.genre) resBooks = resBooks.filter(book => book.genres.find(e => e === args.genre))
+        return resBooks
       } catch (error) {
         throw new UserInputError(error.message, {
           invalidArgs: args,
         })
       }
+    },
+    allTypes: () => {
+      let res = []
+      books.map(book => book.genres).flat().map(book => !res.includes(book) && res.push(book));
+      return res
     },
     allAuthors: async () => await Author.find({}),
     me: (root, args, context) => {
@@ -196,7 +205,12 @@ const resolvers = {
     }
   },
   Mutation: {
-    addBook: async (root, args) => {
+    addBook: async (root, args, context) => {
+      const currentUser = context.currentUser
+
+      if (!currentUser) {
+        throw new AuthenticationError("not authenticated")
+      }
       console.log(args);
       let author = await Author.find({
         name: args.author
@@ -222,7 +236,12 @@ const resolvers = {
       // books = books.concat(book)
       return book
     },
-    editAuthor: (root, args) => {
+    editAuthor: (root, args, context) => {
+      const currentUser = context.currentUser
+
+      if (!currentUser) {
+        throw new AuthenticationError("not authenticated")
+      }
       authors = authors.map(res => res.name === args.name ? {
         ...res,
         born: args.setBornTo
@@ -231,7 +250,8 @@ const resolvers = {
     },
     createUser: (root, args) => {
       const user = new User({
-        username: args.username
+        username: args.username,
+        favoriteGenre: args.favoriteGenre
       })
 
       return user.save()
