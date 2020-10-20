@@ -28,9 +28,17 @@ export const ALL_BOOKS = gql `
   }
 `
 
-export const ALL_TYPES = gql`
+export const ALL_TYPES = gql `
   query {
   allTypes
 }
 `
 
+export const ME = gql `
+  query{
+    me{
+      username
+      favoriteGenre
+    }
+  }
+`

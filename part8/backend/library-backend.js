@@ -13,6 +13,10 @@ const Author = require('./models/Author')
 const Book = require('./models/Book')
 const User = require('./models/User')
 const jwt = require('jsonwebtoken')
+const {
+  PubSub
+} = require('apollo-server')
+const pubsub = new PubSub()
 
 const JWT_SECRET = process.env.SECRET
 const MONGODB_URI = config.MONGODB_URI
@@ -169,6 +173,9 @@ const typeDefs = gql `
       password: String!
     ): Token
   }
+  type Subscription {
+    bookAdded: Book!
+  }    
 `
 
 const resolvers = {
@@ -176,9 +183,6 @@ const resolvers = {
     bookCount: async () => await Book.collection.countDocuments(),
     authorCount: async () => await Author.collection.countDocuments(),
     allBooks: async (root, args) => {
-      // let resBooks = Array.from(books);
-      // if (args.author) resBooks = resBooks.filter(book => book.author === args.author);
-      // if (args.genre) resBooks = resBooks.filter(book => book.genres.find(e => e === args.genre))
       try {
         let resBooks = await Book.find({}).populate('author', {
           name: 1,
@@ -199,7 +203,11 @@ const resolvers = {
       books.map(book => book.genres).flat().map(book => !res.includes(book) && res.push(book));
       return res
     },
-    allAuthors: async () => await Author.find({}),
+    allAuthors: async () => {
+      let author = await Author.find({})
+        .populate('books')
+      return author
+    },
     me: (root, args, context) => {
       return context.currentUser
     }
@@ -211,42 +219,63 @@ const resolvers = {
       if (!currentUser) {
         throw new AuthenticationError("not authenticated")
       }
-      console.log(args);
-      let author = await Author.find({
+
+      if (args.author.length < 4) {
+        throw new UserInputError('author can\'t be less than 4')
+      }
+
+      if (args.title < 2) {
+        throw new UserInputError('title can\'t be less than 2')
+      }
+
+      let author = await Author.findOne({
         name: args.author
       })
-      console.log(author);
+      let isExist = await Book.find({
+        title: args.title
+      })
+
+      if (isExist.length !== 0) {
+        throw new UserInputError('title can\'t be repeat')
+      }
+
       if (!author || author.length === 0) {
         author = await new Author({
           name: args.author
-        }).save()
+        })
       }
-      console.log(author);
+
       const book = await new Book({
         ...args,
         author: author.id
       }).save()
-      // const name = authors.find(author => author.name === args.author)
-      // if (!name) {
-      //   authors = authors.concat({
-      //     name: args.author,
-      //     id: uuid()
-      //   })
-      // }
-      // books = books.concat(book)
+
+      author.books = author.books.concat(book.id)
+      await author.save()
+      let bookRes = await Book.findById(book.id).populate('author', {
+        name: 1,
+        born: 1,
+        id: 1,
+        bookCount: 1
+      })
+      pubsub.publish('BOOK_ADDED', {
+        bookAdded: bookRes
+      })
+
       return book
     },
-    editAuthor: (root, args, context) => {
+    editAuthor: async (root, args, context) => {
       const currentUser = context.currentUser
 
       if (!currentUser) {
         throw new AuthenticationError("not authenticated")
       }
-      authors = authors.map(res => res.name === args.name ? {
-        ...res,
-        born: args.setBornTo
-      } : res)
-      return authors.filter(res => res.name === args.name)[0]
+      let author = await Author.findOne({
+        name: args.name
+      })
+      author.born = args.setBornTo
+      await author.save()
+      return author
     },
     createUser: (root, args) => {
       const user = new User({
@@ -280,8 +309,13 @@ const resolvers = {
       }
     },
   },
+  Subscription: {
+    bookAdded: {
+      subscribe: () => pubsub.asyncIterator(['BOOK_ADDED'])
+    },
+  },
   Author: {
-    bookCount: (root) => books.filter(book => book.author === root.name).length
+    bookCount: async (root) => root.books.length
   }
 }
 
@@ -305,7 +339,9 @@ const server = new ApolloServer({
 })
 
 server.listen().then(({
-  url
+  url,
+  subscriptionsUrl
 }) => {
   console.log(`Server ready at ${url}`)
+  console.log(`Subscriptions ready at ${subscriptionsUrl}`)
 })
