@@ -1,8 +1,9 @@
 import express from 'express';
 import calculateBmi from './bmiCalculator';
-// import calculateExercises from './exerciseCalculator';
+import calculateExercises from './exerciseCalculator';
 import { Request } from 'express';
 const app = express();
+app.use(express.json());
 
 app.get('/Hello', (_req, res) => {
   res.send('Hello Full Stack!');
@@ -32,14 +33,24 @@ app.get('/bmi', (req, res) => {
 });
 
 type resBody = {
-  daily_exercises: string[],
+  daily_exercises: number[],
   target: number
 };
 
 app.post('/exercises', (req: Request<unknown, unknown, resBody>, res) => {
   const { daily_exercises, target } = req.body;
-  console.log(daily_exercises, target);
-  res.send('lol');
+  if (!daily_exercises || !target) {
+    return res.status(400).send({
+      error: "parameters missing"
+    })
+  }
+  if ([...daily_exercises, target].find(e => isNaN(Number(e)))) {
+    return res.status(400).send({
+      error: "malformatted parameters"
+    })
+  }
+
+  return res.json(calculateExercises(daily_exercises, target));
 });
 
 const PORT = 3002;
@@ -47,3 +58,5 @@ const PORT = 3002;
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT}`);
 });
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any

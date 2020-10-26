@@ -53,11 +53,13 @@ const parseArguments = (args: Array<string>) => {
   }
 };
 
-try {
-  const [target, ...hoursArr] = parseArguments(process.argv);
-  console.log(calculateExercises(hoursArr, target));
-} catch ({ message }) {
-  console.log('Error, something bad happened, message: ', message);
+if (require.main === module) {
+  try {
+    const [target, ...hoursArr] = parseArguments(process.argv);
+    console.log(calculateExercises(hoursArr, target));
+  } catch ({ message }) {
+    console.log('Error, something bad happened, message: ', message);
+  }
 }
 
 export default calculateExercises;

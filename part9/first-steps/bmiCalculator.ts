@@ -36,11 +36,14 @@ const parseArguments = (args: Array<string>): BmiVal => {
   }
 };
 
-try {
-  const { hieght, weight } = parseArguments(process.argv);
-  console.log(calculateBmi(hieght, weight));
-} catch ({ message }) {
-  console.log('Error, something bad happened, message: ', message);
+if (require.main === module) {
+  try {
+    const { hieght, weight } = parseArguments(process.argv);
+    console.log(calculateBmi(hieght, weight));
+  } catch ({ message }) {
+    console.log('Error, something bad happened, message: ', message);
+  }
 }
+
 
 export default calculateBmi;
