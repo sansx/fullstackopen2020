@@ -18,6 +18,9 @@ interface BaseEntry {
   diagnosisCodes?: Array<Diagnosis['code']>;
 }
 
+export const EntryTypes = ['OccupationalHealthcare','Hospital', "HealthCheck"];
+
+export type EntryTypes = 'OccupationalHealthcare' | 'Hospital' | "HealthCheck";
 interface OccupationalHealthCareEntry extends BaseEntry {
   type: 'OccupationalHealthcare';
   employerName: string;

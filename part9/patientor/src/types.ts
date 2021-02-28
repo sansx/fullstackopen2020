@@ -11,7 +11,7 @@ export enum Gender {
 }
 
 interface BaseEntry {
-  id: string;
+  id?: string;
   description: string;
   date: string;
   specialist: string;
@@ -23,7 +23,7 @@ export interface OccupationalHealthCareEntry extends BaseEntry {
   employerName: string;
   sickLeave?: {
     startDate: string;
-    endDate: String;
+    endDate: string;
   };
 }
 
@@ -48,6 +48,8 @@ export interface HealthCheckEntry extends BaseEntry {
   type: "HealthCheck";
   healthCheckRating: HealthCheckRating;
 }
+
+export type EntryTypes = 'OccupationalHealthcare' | 'Hospital' | "HealthCheck";
 
 export type Entry =
   | HealthCheckEntry

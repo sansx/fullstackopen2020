@@ -21,6 +21,7 @@ const EntryDetails: React.FC<{ entry: Entry }> = ({ entry }) => {
       });
       arr.length > 0 && setDetail(arr);
     }
+    // eslint-disable-next-line
   }, [diagnoses]);
 
   switch (entry.type) {
